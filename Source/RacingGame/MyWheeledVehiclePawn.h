@@ -10,6 +10,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UAudioComponent;
+class USpotLightComponent;
 /**
  * 
  */
@@ -36,6 +37,8 @@ private:
 	void LookUpDown(float Value);
 	void LookRightLeft(float Value);
 
+	void Lights(bool Value);
+
 
 public:
 	AMyWheeledVehiclePawn();
@@ -51,6 +54,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UAudioComponent* EngineSound;
+
+	UPROPERTY(EditAnywhere)
+	USpotLightComponent* Spotlight;
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

@@ -7,6 +7,7 @@
 #include "ChaosVehicleMovementComponent.h"
 #include "Components/AudioComponent.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
+#include "Components/SpotLightComponent.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -25,7 +26,12 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioEngine"));
 	EngineSound->SetupAttachment(GetMesh());
-	
+
+	Spotlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("SpotLight"));
+	Spotlight->SetupAttachment(GetMesh());
+	Spotlight->SetRelativeLocation(FVector(-170.f, 80.f, 80.f));
+	Spotlight->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+	Spotlight->Intensity = 0.f;
 
 }
 
@@ -34,6 +40,8 @@ void AMyWheeledVehiclePawn::MoveForward(float Value)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("MOVE FORWARD"));
 	GetVehicleMovementComponent()->SetThrottleInput(Value);
+
+	OnLight = false;
 }
 
 
@@ -41,7 +49,7 @@ void AMyWheeledVehiclePawn::MoveBackward(float Value)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("MOVE BACKWARD"));
 
-
+	OnLight = true;
 	GetVehicleMovementComponent()->SetBrakeInput(Value);
 	
 }
@@ -76,6 +84,13 @@ void AMyWheeledVehiclePawn::LookRightLeft(float Value)
 	AddControllerYawInput(Value);
 }
 
+void AMyWheeledVehiclePawn::Lights(bool Value)
+{
+
+	////USE CHANGE MATERIAL PAREMETER COLLECTION to turn on Light
+
+}
+
 
 void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -101,8 +116,14 @@ void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
 		UE_LOG(LogTemp, Warning, TEXT("NO ChAOSWHELEED MOVEMENT"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("RPM %f"), VehicleComponent->GetEngineRotationSpeed());
+	//UE_LOG(LogTemp, Warning, TEXT("RPM %f"), VehicleComponent->GetEngineRotationSpeed());
 	EngineSound->SetFloatParameter(FName("RPM"), VehicleComponent->GetEngineRotationSpeed());
+
+
+	/*if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Bool: %s"), OnLight ? TEXT("true") : TEXT("false")));
+	}*/
 
 }
 
