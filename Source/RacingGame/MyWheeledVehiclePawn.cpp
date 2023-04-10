@@ -8,6 +8,7 @@
 #include "Components/AudioComponent.h"
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "Components/SpotLightComponent.h"
+#include "NiagaraComponent.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -33,6 +34,11 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 	Spotlight->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
 	Spotlight->Intensity = 0.f;
 
+	ExhaustR = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraR"));
+	ExhaustR->SetupAttachment(GetMesh(), FName("LeftExhaust"));
+
+	ExhaustL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraL"));
+	ExhaustL->SetupAttachment(GetMesh(), FName("RightExhaust"));
 }
 
 
@@ -41,7 +47,6 @@ void AMyWheeledVehiclePawn::MoveForward(float Value)
 	//UE_LOG(LogTemp, Warning, TEXT("MOVE FORWARD"));
 	GetVehicleMovementComponent()->SetThrottleInput(Value);
 
-	OnLight = false;
 }
 
 
@@ -49,7 +54,6 @@ void AMyWheeledVehiclePawn::MoveBackward(float Value)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("MOVE BACKWARD"));
 
-	OnLight = true;
 	GetVehicleMovementComponent()->SetBrakeInput(Value);
 	
 }
@@ -119,12 +123,34 @@ void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
 	//UE_LOG(LogTemp, Warning, TEXT("RPM %f"), VehicleComponent->GetEngineRotationSpeed());
 	EngineSound->SetFloatParameter(FName("RPM"), VehicleComponent->GetEngineRotationSpeed());
 
+	float RPM = VehicleComponent->GetEngineRotationSpeed();
+
+	if (RPM >= 1300 && RPM < 7000) 
+	{
+		SetIncreaseSmokeExhaust();
+	}
+	else 
+	{
+		SetDecreaseSmokeExhaust();
+	}
 
 	/*if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Bool: %s"), OnLight ? TEXT("true") : TEXT("false")));
 	}*/
 
+}
+
+void AMyWheeledVehiclePawn::SetIncreaseSmokeExhaust()
+{
+	ExhaustL->SetFloatParameter(FName("SpawnRateRPM"), 600);
+	ExhaustR->SetFloatParameter(FName("SpawnRateRPM"), 600);
+}
+
+void AMyWheeledVehiclePawn::SetDecreaseSmokeExhaust()
+{
+	ExhaustL->SetFloatParameter(FName("SpawnRateRPM"), 100);
+	ExhaustR->SetFloatParameter(FName("SpawnRateRPM"), 100);
 }
 
 

@@ -11,6 +11,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UAudioComponent;
 class USpotLightComponent;
+class UNiagaraComponent;
 /**
  * 
  */
@@ -58,7 +59,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	USpotLightComponent* Spotlight;
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* ExhaustR;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* ExhaustL;
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
+
+	void SetIncreaseSmokeExhaust();
+	void SetDecreaseSmokeExhaust();
 };
