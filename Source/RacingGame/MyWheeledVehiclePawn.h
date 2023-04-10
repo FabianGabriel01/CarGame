@@ -9,6 +9,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class UAudioComponent;
 /**
  * 
  */
@@ -35,6 +36,7 @@ private:
 	void LookUpDown(float Value);
 	void LookRightLeft(float Value);
 
+
 public:
 	AMyWheeledVehiclePawn();
 
@@ -47,6 +49,10 @@ public:
 	/*UPROPERTY(EditAnywhere)
 	TArray<class UChaosVehicleWheel*> Wheels;*/
 
+	UPROPERTY(EditAnywhere)
+	UAudioComponent* EngineSound;
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void Tick(float DeltaSeconds) override;
 };

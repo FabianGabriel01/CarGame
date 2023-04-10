@@ -5,6 +5,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/cameraComponent.h"
 #include "ChaosVehicleMovementComponent.h"
+#include "Components/AudioComponent.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -20,6 +22,10 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 	SpringArm->SetRelativeLocation(FVector(0,0,140.f));
 	SpringArm->SetRelativeRotation(FRotator(-20.0,0.f, 0));
 	SpringArm->bUsePawnControlRotation = true;
+
+	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioEngine"));
+	EngineSound->SetupAttachment(GetMesh());
+	
 
 }
 
@@ -70,6 +76,7 @@ void AMyWheeledVehiclePawn::LookRightLeft(float Value)
 	AddControllerYawInput(Value);
 }
 
+
 void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -82,6 +89,21 @@ void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	PlayerInputComponent->BindAction(FName("Brake"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::BreakPresed);
 	PlayerInputComponent->BindAction(FName("Brake"), EInputEvent::IE_Released, this, &AMyWheeledVehiclePawn::BreakReleased);
+}
+
+void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
+{
+	//Super::Tick(float DeltaSeconds);
+
+	UChaosWheeledVehicleMovementComponent* VehicleComponent = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent());
+	if (!VehicleComponent) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO ChAOSWHELEED MOVEMENT"));
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("RPM %f"), VehicleComponent->GetEngineRotationSpeed());
+	EngineSound->SetFloatParameter(FName("RPM"), VehicleComponent->GetEngineRotationSpeed());
+
 }
 
 
