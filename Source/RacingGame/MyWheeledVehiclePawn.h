@@ -65,10 +65,26 @@ public:
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* ExhaustL;
 
+	///////////////
+	UPROPERTY(EditAnywhere)
+		UNiagaraComponent* WheelFR;
+
+	UPROPERTY(EditAnywhere)
+		UNiagaraComponent* WheelFL;
+
+	UPROPERTY(EditAnywhere)
+		UNiagaraComponent* WheelBR;
+
+	UPROPERTY(EditAnywhere)
+		UNiagaraComponent* WheelBL;
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	void SetIncreaseSmokeExhaust();
 	void SetDecreaseSmokeExhaust();
+
+	void ActivateTrials(bool IsHandBrake);
+	void DeactivateTrials();
 };

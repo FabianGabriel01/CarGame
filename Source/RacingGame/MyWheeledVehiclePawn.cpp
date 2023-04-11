@@ -39,6 +39,18 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 
 	ExhaustL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraL"));
 	ExhaustL->SetupAttachment(GetMesh(), FName("RightExhaust"));
+
+	WheelFR = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialFR"));
+	WheelFR->SetupAttachment(GetMesh(), FName("FR"));
+
+	WheelFL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialFL"));
+	WheelFL->SetupAttachment(GetMesh(), FName("FL"));
+
+	WheelBR = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialBR"));
+	WheelBR->SetupAttachment(GetMesh(), FName("BR"));
+
+	WheelBL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialBL"));
+	WheelBL->SetupAttachment(GetMesh(), FName("BL"));
 }
 
 
@@ -55,6 +67,14 @@ void AMyWheeledVehiclePawn::MoveBackward(float Value)
 	//UE_LOG(LogTemp, Warning, TEXT("MOVE BACKWARD"));
 
 	GetVehicleMovementComponent()->SetBrakeInput(Value);
+	if (Value > 0 && !WheelFR->IsActive())
+	{
+		ActivateTrials(false);
+	}
+	if (Value == 0 && !WheelFR->IsActive())
+	{
+		DeactivateTrials();
+	}
 	
 }
 
@@ -68,12 +88,14 @@ void AMyWheeledVehiclePawn::BreakPresed()
 {
 	UE_LOG(LogTemp, Warning, TEXT("break pressed"));
 	GetVehicleMovementComponent()->SetHandbrakeInput(true);
+	ActivateTrials(true);
 }
 
 void AMyWheeledVehiclePawn::BreakReleased()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Break Released"));
 	GetVehicleMovementComponent()->SetHandbrakeInput(false);
+	DeactivateTrials();
 }
 
 void AMyWheeledVehiclePawn::LookUpDown(float Value)
@@ -151,6 +173,29 @@ void AMyWheeledVehiclePawn::SetDecreaseSmokeExhaust()
 {
 	ExhaustL->SetFloatParameter(FName("SpawnRateRPM"), 100);
 	ExhaustR->SetFloatParameter(FName("SpawnRateRPM"), 100);
+}
+
+void AMyWheeledVehiclePawn::ActivateTrials(bool IsHandBrake)
+{
+	WheelBR->Activate();
+	WheelBL->Activate();
+
+	if (IsHandBrake)
+		return;
+	WheelFR->Activate();
+	WheelFL->Activate();
+
+}
+
+void AMyWheeledVehiclePawn::DeactivateTrials()
+{
+	WheelFR->Deactivate();
+
+	WheelFL->Deactivate();
+
+	WheelBR->Deactivate();
+
+	WheelBL->Deactivate();
 }
 
 
