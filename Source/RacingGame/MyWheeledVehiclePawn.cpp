@@ -71,7 +71,7 @@ void AMyWheeledVehiclePawn::MoveBackward(float Value)
 	{
 		ActivateTrials(false);
 	}
-	if (Value == 0 && !WheelFR->IsActive())
+	if (Value == 0 && WheelFR->IsActive())
 	{
 		DeactivateTrials();
 	}
