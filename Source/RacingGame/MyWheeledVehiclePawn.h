@@ -13,6 +13,7 @@ class UAudioComponent;
 class USpotLightComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
+class UPhysicsThrusterComponent;
 /**
  * 
  */
@@ -78,16 +79,28 @@ public:
 
 	///////////////
 	UPROPERTY(EditAnywhere)
-		UNiagaraComponent* WheelFR;
+	UNiagaraComponent* WheelFR;
 
 	UPROPERTY(EditAnywhere)
-		UNiagaraComponent* WheelFL;
+	UNiagaraComponent* WheelFL;
 
 	UPROPERTY(EditAnywhere)
-		UNiagaraComponent* WheelBR;
+	UNiagaraComponent* WheelBR;
 
 	UPROPERTY(EditAnywhere)
-		UNiagaraComponent* WheelBL;
+	UNiagaraComponent* WheelBL;
+
+	UPROPERTY(EditAnywhere)
+	UPhysicsThrusterComponent* NitrousBoost;
+
+	UPROPERTY(EditAnywhere)
+		float LocationImpulseX;
+
+	UPROPERTY(EditAnywhere)
+		float LocationImpulseY;
+
+	UPROPERTY(EditAnywhere)
+		float LocationImpulseZ;
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

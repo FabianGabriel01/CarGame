@@ -10,6 +10,7 @@
 #include "Components/SpotLightComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "PhysicsEngine/PhysicsThrusterComponent.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -189,6 +190,18 @@ void AMyWheeledVehiclePawn::EnabledNitrous()
 	}
 	NitrousL = InItNiagaraNitrous(FName("LeftExhaust"));
 	NitrousR = InItNiagaraNitrous(FName("RightExhaust"));
+
+	NitrousBoost = NewObject<UPhysicsThrusterComponent>(this, UPhysicsThrusterComponent::StaticClass());
+	NitrousBoost->SetupAttachment(GetMesh());
+	NitrousBoost->SetRelativeLocation(FVector(LocationImpulseX, LocationImpulseY, LocationImpulseZ));
+	//NitrousBoost->SetRelativeLocation(FVector(142.f, 0.f, 50.f));
+	NitrousBoost->SetRelativeRotation(FRotator(180.f, 0, 0));
+	NitrousBoost->ThrustStrength = 4000000;
+	NitrousBoost->RegisterComponent();
+
+	if (!NitrousBoost)
+		UE_LOG(LogTemp, Warning, TEXT("NITRO NOT INITIALIZE"));
+	NitrousBoost->Activate();
 }
 
 void AMyWheeledVehiclePawn::DisableNitrous()
@@ -200,6 +213,12 @@ void AMyWheeledVehiclePawn::DisableNitrous()
 
 		NitrousL->DestroyComponent();
 		NitrousR->DestroyComponent();
+	}
+
+	if (NitrousBoost)
+	{
+		NitrousBoost->Deactivate();
+		NitrousBoost->DestroyComponent();
 	}
 }
 
