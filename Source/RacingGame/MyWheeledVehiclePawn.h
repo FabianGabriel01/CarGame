@@ -14,6 +14,7 @@ class USpotLightComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class UPhysicsThrusterComponent;
+class USoundBase;
 /**
  * 
  */
@@ -57,6 +58,16 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UAudioComponent* EngineSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* NitrousSound;
+
+	UPROPERTY(EditAnywhere)
+	UAudioComponent* AC_Nitrous;
+
+	/// <summary>
+	/// /////////////////////
+	/// </summary>
 
 	UPROPERTY(EditAnywhere)
 	USpotLightComponent* Spotlight;

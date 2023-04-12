@@ -202,6 +202,16 @@ void AMyWheeledVehiclePawn::EnabledNitrous()
 	if (!NitrousBoost)
 		UE_LOG(LogTemp, Warning, TEXT("NITRO NOT INITIALIZE"));
 	NitrousBoost->Activate();
+
+	if (NitrousSound) 
+	{
+		AC_Nitrous = NewObject<UAudioComponent>(this, UAudioComponent::StaticClass());
+		AC_Nitrous->SetupAttachment(GetMesh());
+		AC_Nitrous->SetSound(NitrousSound);
+		AC_Nitrous->SetVolumeMultiplier(0.5f);
+		AC_Nitrous->Activate();
+
+	}
 }
 
 void AMyWheeledVehiclePawn::DisableNitrous()
@@ -219,6 +229,12 @@ void AMyWheeledVehiclePawn::DisableNitrous()
 	{
 		NitrousBoost->Deactivate();
 		NitrousBoost->DestroyComponent();
+	}
+
+	if (AC_Nitrous) 
+	{
+		AC_Nitrous->Deactivate();
+		AC_Nitrous->DestroyComponent();
 	}
 }
 
