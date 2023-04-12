@@ -12,6 +12,7 @@ class USpringArmComponent;
 class UAudioComponent;
 class USpotLightComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 /**
  * 
  */
@@ -65,6 +66,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	UNiagaraComponent* ExhaustL;
 
+	/////////////////NITROUS
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* Nitrous;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* NitrousL;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* NitrousR;
+
 	///////////////
 	UPROPERTY(EditAnywhere)
 		UNiagaraComponent* WheelFR;
@@ -84,7 +95,11 @@ protected:
 
 	void SetIncreaseSmokeExhaust();
 	void SetDecreaseSmokeExhaust();
+	void EnabledNitrous();
+	void DisableNitrous();
 
 	void ActivateTrials(bool IsHandBrake);
 	void DeactivateTrials();
+
+	UNiagaraComponent* InItNiagaraNitrous(FName SocketName);
 };

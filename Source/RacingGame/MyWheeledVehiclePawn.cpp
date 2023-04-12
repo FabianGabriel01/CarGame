@@ -9,6 +9,7 @@
 #include "ChaosWheeledVehicleMovementComponent.h"
 #include "Components/SpotLightComponent.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -51,6 +52,8 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 
 	WheelBL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialBL"));
 	WheelBL->SetupAttachment(GetMesh(), FName("BL"));
+
+
 }
 
 
@@ -130,6 +133,8 @@ void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	PlayerInputComponent->BindAction(FName("Brake"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::BreakPresed);
 	PlayerInputComponent->BindAction(FName("Brake"), EInputEvent::IE_Released, this, &AMyWheeledVehiclePawn::BreakReleased);
+	PlayerInputComponent->BindAction(FName("Nitrous"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::EnabledNitrous);
+	PlayerInputComponent->BindAction(FName("Nitrous"), EInputEvent::IE_Released, this, &AMyWheeledVehiclePawn::DisableNitrous);
 }
 
 void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
@@ -173,6 +178,38 @@ void AMyWheeledVehiclePawn::SetDecreaseSmokeExhaust()
 {
 	ExhaustL->SetFloatParameter(FName("SpawnRateRPM"), 100);
 	ExhaustR->SetFloatParameter(FName("SpawnRateRPM"), 100);
+}
+
+void AMyWheeledVehiclePawn::EnabledNitrous()
+{
+	if (!Nitrous) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("havent nigara system set"));
+		return;
+	}
+	NitrousL = InItNiagaraNitrous(FName("LeftExhaust"));
+	NitrousR = InItNiagaraNitrous(FName("RightExhaust"));
+}
+
+void AMyWheeledVehiclePawn::DisableNitrous()
+{
+	if (NitrousL && NitrousR) 
+	{
+		NitrousL->Deactivate();
+		NitrousR->Deactivate();
+
+		NitrousL->DestroyComponent();
+		NitrousR->DestroyComponent();
+	}
+}
+
+UNiagaraComponent* AMyWheeledVehiclePawn::InItNiagaraNitrous(FName SocketName)
+{
+	UNiagaraComponent* NC = NewObject<UNiagaraComponent>(this, UNiagaraComponent::StaticClass());
+	NC->SetupAttachment(GetMesh(), SocketName);
+	NC->SetAsset(Nitrous);
+	NC->RegisterComponent();
+	return NC;
 }
 
 void AMyWheeledVehiclePawn::ActivateTrials(bool IsHandBrake)
