@@ -12,6 +12,7 @@
 #include "NiagaraSystem.h"
 #include "PhysicsEngine/PhysicsThrusterComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/SceneCaptureComponent2D.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -54,6 +55,11 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 
 	WheelBL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialBL"));
 	WheelBL->SetupAttachment(GetMesh(), FName("BL"));
+
+	SceneCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceenCapture"));
+	SceneCapture->SetupAttachment(GetMesh());
+	SceneCapture->SetRelativeLocation(FVector(-230, 0, 130));
+	SceneCapture->SetRelativeRotation(FRotator(0, 180,0));
 
 
 

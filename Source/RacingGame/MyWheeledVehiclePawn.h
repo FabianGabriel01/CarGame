@@ -15,6 +15,7 @@ class UNiagaraComponent;
 class UNiagaraSystem;
 class UPhysicsThrusterComponent;
 class USoundBase;
+class USceneCaptureComponent2D;
 /**
  * 
  */
@@ -121,6 +122,10 @@ public:
 	bool bNitroPressed = false;
 
 	float CurrentNitroValue = 100;
+
+	//////////////////
+	UPROPERTY(EditAnywhere)
+		USceneCaptureComponent2D* SceneCapture;
 
 
 protected:
