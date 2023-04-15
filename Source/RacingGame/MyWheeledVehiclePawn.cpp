@@ -11,6 +11,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "PhysicsEngine/PhysicsThrusterComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -53,6 +54,8 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 
 	WheelBL = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrialBL"));
 	WheelBL->SetupAttachment(GetMesh(), FName("BL"));
+
+
 
 
 }
@@ -122,6 +125,8 @@ void AMyWheeledVehiclePawn::Lights(bool Value)
 }
 
 
+
+
 void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -151,7 +156,26 @@ void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
 	//UE_LOG(LogTemp, Warning, TEXT("RPM %f"), VehicleComponent->GetEngineRotationSpeed());
 	EngineSound->SetFloatParameter(FName("RPM"), VehicleComponent->GetEngineRotationSpeed());
 
-	float RPM = VehicleComponent->GetEngineRotationSpeed();
+	const float RPM = VehicleComponent->GetEngineRotationSpeed();
+	const float RPMPercentage = 100 * RPM / 7000;
+	const float Speed = (float)UKismetMathLibrary::FCeil(VehicleComponent->GetForwardSpeedMPH());
+	const int CurrentGear = VehicleComponent->GetCurrentGear();
+
+	if (bNitroPressed) 
+	{
+		CurrentNitroValue = UKismetMathLibrary::FInterpTo(CurrentNitroValue, 0, DeltaSeconds, 1);
+		if (CurrentNitroValue < 10) 
+		{
+			DisableNitrous();
+		}
+	}
+	else 
+	{
+		CurrentNitroValue = UKismetMathLibrary::FInterpTo(CurrentNitroValue, 100, DeltaSeconds, 0.1f);
+	}
+
+	UpdateHUD(Speed, RPMPercentage,CurrentGear, CurrentNitroValue, bNitroPressed);
+
 
 	if (RPM >= 1300 && RPM < 7000) 
 	{
@@ -212,6 +236,8 @@ void AMyWheeledVehiclePawn::EnabledNitrous()
 		AC_Nitrous->Activate();
 
 	}
+
+	bNitroPressed = true;
 }
 
 void AMyWheeledVehiclePawn::DisableNitrous()
@@ -236,6 +262,8 @@ void AMyWheeledVehiclePawn::DisableNitrous()
 		AC_Nitrous->Deactivate();
 		AC_Nitrous->DestroyComponent();
 	}
+
+	bNitroPressed = false;
 }
 
 UNiagaraComponent* AMyWheeledVehiclePawn::InItNiagaraNitrous(FName SocketName)

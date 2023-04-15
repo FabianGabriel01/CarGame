@@ -113,6 +113,16 @@ public:
 	UPROPERTY(EditAnywhere)
 		float LocationImpulseZ;
 
+	///////HUD
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateHUD(float Speed, float RPMPercentage, int CurrentGear, float NitroPercentage, bool NitroPressed);
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	bool bNitroPressed = false;
+
+	float CurrentNitroValue = 100;
+
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
