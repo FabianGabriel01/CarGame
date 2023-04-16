@@ -17,6 +17,8 @@ class UPhysicsThrusterComponent;
 class USoundBase;
 class USceneCaptureComponent2D;
 class UMaterialParameterCollection;
+class UMediaSoundComponent;
+class UMediaPlaylist;
 /**
  * 
  */
@@ -131,6 +133,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UMaterialParameterCollection* MaterialsCollection;
 
+	/////RadioSystem
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMediaSoundComponent* MediaPlayer;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int CurrentPlaylist = -1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<UMediaPlaylist*>  RadioPlaylists;
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
@@ -143,6 +154,9 @@ protected:
 
 	void ActivateTrials(bool IsHandBrake);
 	void DeactivateTrials();
+
+	///Radio
+	void RadioPressed();
 
 	UNiagaraComponent* InItNiagaraNitrous(FName SocketName);
 };

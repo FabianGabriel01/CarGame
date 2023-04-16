@@ -14,6 +14,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Materials/MaterialParameterCollection.h"
+#include "MediaSoundComponent.h"
+#include "MediaPlayer.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -62,8 +64,8 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 	SceneCapture->SetRelativeLocation(FVector(-230, 0, 130));
 	SceneCapture->SetRelativeRotation(FRotator(0, 180,0));
 
-
-
+	MediaPlayer = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("MediaPlayer"));
+	MediaPlayer->SetupAttachment(RootComponent);
 
 }
 
@@ -146,8 +148,12 @@ void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	PlayerInputComponent->BindAction(FName("Brake"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::BreakPresed);
 	PlayerInputComponent->BindAction(FName("Brake"), EInputEvent::IE_Released, this, &AMyWheeledVehiclePawn::BreakReleased);
-	PlayerInputComponent->BindAction(FName("Nitrous"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::EnabledNitrous);
 	PlayerInputComponent->BindAction(FName("Nitrous"), EInputEvent::IE_Released, this, &AMyWheeledVehiclePawn::DisableNitrous);
+	PlayerInputComponent->BindAction(FName("Nitrous"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::EnabledNitrous);
+
+	/////RadioInputs
+	PlayerInputComponent->BindAction(FName("RadioB"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::RadioPressed);
+
 }
 
 void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
@@ -271,6 +277,23 @@ void AMyWheeledVehiclePawn::DisableNitrous()
 	}
 
 	bNitroPressed = false;
+}
+
+void AMyWheeledVehiclePawn::RadioPressed()
+{
+	if (!(RadioPlaylists.Num() > 0 && MediaPlayer)) return;
+	UE_LOG(LogTemp, Warning, TEXT("RADIO BUTTON"));
+
+	if (CurrentPlaylist == RadioPlaylists.Num() - 1)
+	{
+		CurrentPlaylist = -1;
+		MediaPlayer->GetMediaPlayer()->Pause();
+	}
+	else 
+	{
+		CurrentPlaylist++;
+		MediaPlayer->GetMediaPlayer()->OpenPlaylist(RadioPlaylists[0]);
+	}
 }
 
 UNiagaraComponent* AMyWheeledVehiclePawn::InItNiagaraNitrous(FName SocketName)
