@@ -16,6 +16,7 @@ class UNiagaraSystem;
 class UPhysicsThrusterComponent;
 class USoundBase;
 class USceneCaptureComponent2D;
+class UMaterialParameterCollection;
 /**
  * 
  */
@@ -126,6 +127,9 @@ public:
 	//////////////////
 	UPROPERTY(EditAnywhere)
 		USceneCaptureComponent2D* SceneCapture;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UMaterialParameterCollection* MaterialsCollection;
 
 
 protected:

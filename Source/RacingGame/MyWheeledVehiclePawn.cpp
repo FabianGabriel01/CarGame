@@ -13,6 +13,7 @@
 #include "PhysicsEngine/PhysicsThrusterComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Materials/MaterialParameterCollection.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
