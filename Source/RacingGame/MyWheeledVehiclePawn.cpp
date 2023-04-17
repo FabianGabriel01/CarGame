@@ -16,6 +16,8 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "MediaSoundComponent.h"
 #include "MediaPlayer.h"
+#include "Components/BoxComponent.h"
+#include "Components/ArrowComponent.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -66,6 +68,9 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 
 	MediaPlayer = CreateDefaultSubobject<UMediaSoundComponent>(TEXT("MediaPlayer"));
 	MediaPlayer->SetupAttachment(RootComponent);
+
+	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
+	Arrow->SetupAttachment(RootComponent);
 
 }
 
@@ -134,7 +139,14 @@ void AMyWheeledVehiclePawn::Lights(bool Value)
 }
 
 
-
+void AMyWheeledVehiclePawn::Shoot()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ROCKET LAUNCHED"));
+	if (RocketClass)
+		GetWorld()->SpawnActor<ARocketLauncher>(RocketClass, Arrow->GetComponentLocation(), Arrow->GetComponentRotation(), FActorSpawnParameters());
+	else
+		UE_LOG(LogTemp, Warning, TEXT("NOT ROCKET"));
+}
 
 void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -153,6 +165,7 @@ void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	/////RadioInputs
 	PlayerInputComponent->BindAction(FName("RadioB"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::RadioPressed);
+	PlayerInputComponent->BindAction(FName("Shoot"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::Shoot);
 
 }
 
@@ -199,11 +212,12 @@ void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
 		SetDecreaseSmokeExhaust();
 	}
 
-	/*if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Bool: %s"), OnLight ? TEXT("true") : TEXT("false")));
-	}*/
 
+}
+
+void AMyWheeledVehiclePawn::BeginPlay() 
+{
+	Super::BeginPlay();
 }
 
 void AMyWheeledVehiclePawn::SetIncreaseSmokeExhaust()

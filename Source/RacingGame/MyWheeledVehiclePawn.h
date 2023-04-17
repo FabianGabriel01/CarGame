@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "WheeledVehiclePawn.h"
+#include "RocketLauncher.h"
 #include "MyWheeledVehiclePawn.generated.h"
 
 
@@ -19,6 +20,8 @@ class USceneCaptureComponent2D;
 class UMaterialParameterCollection;
 class UMediaSoundComponent;
 class UMediaPlaylist;
+class UBoxComponent;
+class UArrowComponent;
 /**
  * 
  */
@@ -143,9 +146,29 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<UMediaPlaylist*>  RadioPlaylists;
 
+	/// <summary>
+	/// ///////////////////////////////////
+	/// </summary>
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UBoxComponent* BoxLeft;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UBoxComponent* BoxRight;
+
+	////for attack
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UArrowComponent* Arrow;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TSubclassOf<class ARocketLauncher> RocketClass;
+
+	UFUNCTION()
+		void Shoot();
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
 	void SetIncreaseSmokeExhaust();
 	void SetDecreaseSmokeExhaust();
