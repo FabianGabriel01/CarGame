@@ -10,6 +10,8 @@
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "RacingGame/MyDamageType.h"
+#include "Components/SceneComponent.h"
+#include "UObject/WeakObjectPtrTemplates.h"
 
 // Sets default values
 ARocketLauncher::ARocketLauncher()
@@ -25,13 +27,21 @@ ARocketLauncher::ARocketLauncher()
 	Mesh->SetupAttachment(SphereComp);
 
 	ProjectileMomvement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
-	ProjectileMomvement->InitialSpeed = 10000;
-	ProjectileMomvement->MaxSpeed = 10000;
+	ProjectileMomvement->InitialSpeed = 5000;
+	ProjectileMomvement->MaxSpeed = 5000;
 	ProjectileMomvement->ProjectileGravityScale = 0;
+	ProjectileMomvement->SetAutoActivate(false);
 
 	NiagaraSmoke = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
 	NiagaraSmoke->SetupAttachment(SphereComp);
 
+}
+
+void ARocketLauncher::SetHomingMisime(TWeakObjectPtr<USceneComponent> SceneComp)
+{
+	ProjectileMomvement->bIsHomingProjectile = true;
+	ProjectileMomvement->HomingAccelerationMagnitude = 3000;
+	ProjectileMomvement->HomingTargetComponent = SceneComp;
 }
 
 // Called when the game starts or when spawned
@@ -39,6 +49,7 @@ void ARocketLauncher::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ARocketLauncher::SphereCollisionOverlap);
+	ProjectileMomvement->SetAutoActivate(true);
 	if (SoundExplode) 
 	{
 		UGameplayStatics::SpawnSound2D(GetWorld(), SoundExplode);

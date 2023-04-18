@@ -22,6 +22,8 @@ class UMediaSoundComponent;
 class UMediaPlaylist;
 class UBoxComponent;
 class UArrowComponent;
+class UDecalComponent;
+class UMaterialInstanceDynamic;
 /**
  * 
  */
@@ -149,11 +151,17 @@ public:
 	/// <summary>
 	/// ///////////////////////////////////
 	/// </summary>
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	/*UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UBoxComponent* BoxLeft;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UBoxComponent* BoxRight;
+
+	UFUNCTION(BlueprintCallable)
+	void BoxCollisionOverlap_L(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void BoxCollisionOverlap_R(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);*/
 
 	////for attack
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -164,6 +172,38 @@ public:
 
 	UFUNCTION()
 		void Shoot();
+
+	UFUNCTION()
+		void TargetShoot();
+
+	UFUNCTION(BlueprintCallable)
+	void OnJump();
+
+
+
+
+	////////////Dirt Decal
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UDecalComponent* DirtDelcalL;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UDecalComponent* DirtDelcalR;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		UDecalComponent* DirtDelcalCenter;
+
+
+	//////////Health
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Health;
+
+	/////ForDamage
+	UFUNCTION()
+	void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UMaterialInstanceDynamic* DecalSides;
+	UMaterialInstanceDynamic* DecalCenter;
+
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

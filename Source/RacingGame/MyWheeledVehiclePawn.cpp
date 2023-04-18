@@ -18,6 +18,10 @@
 #include "MediaPlayer.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
+#include "Components/DecalComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
 
 AMyWheeledVehiclePawn::AMyWheeledVehiclePawn() 
 {
@@ -72,6 +76,22 @@ AMyWheeledVehiclePawn::AMyWheeledVehiclePawn()
 	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	Arrow->SetupAttachment(RootComponent);
 
+	DirtDelcalL = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalL"));
+	DirtDelcalL->SetupAttachment(GetMesh());
+
+	DirtDelcalR = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalR"));
+	DirtDelcalR->SetupAttachment(GetMesh());
+
+	DirtDelcalCenter = CreateDefaultSubobject<UDecalComponent>(TEXT("DecalCenter"));
+	DirtDelcalCenter->SetupAttachment(GetMesh());
+
+	/*BoxLeft = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxL"));
+	BoxLeft->SetupAttachment(GetMesh());
+	BoxLeft->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+
+	BoxRight = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxR"));
+	BoxRight->SetupAttachment(GetMesh());
+	BoxRight->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);*/
 }
 
 
@@ -139,6 +159,16 @@ void AMyWheeledVehiclePawn::Lights(bool Value)
 }
 
 
+//void AMyWheeledVehiclePawn::BoxCollisionOverlap_L(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("BOX L"));
+//}
+//
+//void AMyWheeledVehiclePawn::BoxCollisionOverlap_R(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("BOX R"));
+//}
+
 void AMyWheeledVehiclePawn::Shoot()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ROCKET LAUNCHED"));
@@ -146,6 +176,58 @@ void AMyWheeledVehiclePawn::Shoot()
 		GetWorld()->SpawnActor<ARocketLauncher>(RocketClass, Arrow->GetComponentLocation(), Arrow->GetComponentRotation(), FActorSpawnParameters());
 	else
 		UE_LOG(LogTemp, Warning, TEXT("NOT ROCKET"));
+}
+
+void AMyWheeledVehiclePawn::TargetShoot()
+{
+	UE_LOG(LogTemp, Warning, TEXT("GuideMissile"));
+	TArray<AActor*> Cars;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMyWheeledVehiclePawn::StaticClass(), Cars);
+	AActor* ChoosenTarget = nullptr;
+	for (AActor* Element : Cars) 
+	{
+		if(Element != this)
+		{
+			if (this->GetHorizontalDotProductTo(Element) > 0.8) 
+			{
+				ChoosenTarget = Element;
+				break;
+			}
+		}
+	}
+
+
+	ARocketLauncher* TargetMisil = GetWorld()->SpawnActorDeferred<ARocketLauncher>(RocketClass, Arrow->GetComponentTransform());
+	if (ChoosenTarget) 
+	{
+		TargetMisil->SetHomingMisime(ChoosenTarget->GetRootComponent());
+	}
+	TargetMisil->FinishSpawning(Arrow->GetComponentTransform());
+}
+
+void AMyWheeledVehiclePawn::OnJump() 
+{
+	GetMesh()->AddImpulse(FVector(0,0,700), FName("Root"), true);
+}
+
+void AMyWheeledVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Warning, TEXT("RECIEVING DAMAGE"));
+
+	Health = UKismetMathLibrary::Abs(Health - Damage);
+	if (!DecalSides || !DecalCenter) 
+	{
+		DecalSides = UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), DirtDelcalL->GetDecalMaterial());
+		DecalCenter = UKismetMaterialLibrary::CreateDynamicMaterialInstance(GetWorld(), DirtDelcalCenter->GetDecalMaterial());
+	}
+
+	float DefaultOpacity = DecalSides->K2_GetScalarParameterValue(FName("Opacity"));
+	DecalSides->SetScalarParameterValue(FName("Dirt"), 2 + DefaultOpacity);
+	DecalCenter->SetScalarParameterValue(FName("Dirt"), 2 + DefaultOpacity);
+
+	DirtDelcalL->SetDecalMaterial(DecalSides);
+	DirtDelcalR->SetDecalMaterial(DecalSides);
+	DirtDelcalCenter->SetDecalMaterial(DecalCenter);
 }
 
 void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -166,6 +248,8 @@ void AMyWheeledVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	/////RadioInputs
 	PlayerInputComponent->BindAction(FName("RadioB"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::RadioPressed);
 	PlayerInputComponent->BindAction(FName("Shoot"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::Shoot);
+	PlayerInputComponent->BindAction(FName("TargetShoot"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::TargetShoot);
+	//PlayerInputComponent->BindAction(FName("Jump"), EInputEvent::IE_Pressed, this, &AMyWheeledVehiclePawn::OnJump);
 
 }
 
@@ -218,6 +302,12 @@ void AMyWheeledVehiclePawn::Tick(float DeltaSeconds)
 void AMyWheeledVehiclePawn::BeginPlay() 
 {
 	Super::BeginPlay();
+	Health = 100;
+
+	this->OnTakeAnyDamage.AddDynamic(this, &AMyWheeledVehiclePawn::OnTakeDamage);
+
+	//BoxLeft->OnComponentBeginOverlap.AddDynamic(this, &AMyWheeledVehiclePawn::BoxCollisionOverlap_L);
+	//BoxRight->OnComponentBeginOverlap.AddDynamic(this, &AMyWheeledVehiclePawn::BoxCollisionOverlap_R);
 }
 
 void AMyWheeledVehiclePawn::SetIncreaseSmokeExhaust()

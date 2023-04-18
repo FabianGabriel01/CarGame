@@ -12,6 +12,7 @@ class UParticleSystem;
 class USoundBase;
 class UProjectileMovementComponent;
 class UNiagaraComponent;
+class USceneComponent;
 
 UCLASS()
 class RACINGGAME_API ARocketLauncher : public AActor
@@ -39,6 +40,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		UNiagaraComponent* NiagaraSmoke;
+
+		void SetHomingMisime(TWeakObjectPtr<USceneComponent> SceneComp);
 
 
 protected:
